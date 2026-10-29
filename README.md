@@ -1,26 +1,40 @@
 # Nullspace
 
-**Nullspace makes DataHub record what your agents searched for and could not find, so the missing tables get built and the blocked agents get unblocked.**
+## TLDR
+
+Keep a demand record when an agent searches DataHub for a dataset that does not exist.<br>
+For data teams deciding which missing tables to build and which agents are waiting for them.<br>
+A ghost accumulates demand, a builder proposes a dbt change, and fulfilment remains reviewable through a pull request.
+
+## The problem and approach
 
 Today when an agent searches a catalog for a table that does not exist, the miss is thrown away: no ticket, no record, nothing.
-For data teams running DataHub with agents that query it.
 Every miss creates or increments a ghost, a real DataHub dataset URN tagged `ghost` with a demand counter and edges back to each agent that asked; at a threshold a builder agent writes a real dbt model and opens a real pull request, and on merge the ghost goes solid.
 A catalog is a map of what exists; this one also maps what is missing. Built for Build with DataHub: The Agent Hackathon. A frozen, readable snapshot: https://nullspace-five.vercel.app
 
+## Review and pick up the work
+
+[Agent guide](AGENTS.md)
+
+Start with the linked source, setup and evidence. Recorded demos and sample data keep their original scope; use the repository instructions for a fresh run.
+
+**A catalog is a map of what exists. Nullspace makes DataHub the first catalog
+that also maps what is missing.**
+
 An agent searches for a table it needs, does not find it, and fails silently in
-its own context. That miss is thrown away today — no ticket, no record, nothing.
+its own context. That miss is thrown away today ;  no ticket, no record, nothing.
 Nullspace keeps it: every miss materialises or increments a **ghost**, a real
 DataHub dataset URN tagged `ghost`, carrying a demand counter and edges back to
 every agent that asked. Three agents in three separate contexts discover, for the
 first time, that they wanted the same thing. At the threshold a builder agent
-claims it, writes a real dbt model, opens a real pull request — and on merge the
+claims it, writes a real dbt model, opens a real pull request ;  and on merge the
 ghost goes solid, with the requesters as native Owners of the table they caused
 to exist.
 
 Then the part everyone forgets: **the agents that were blocked stop being
 blocked, and nobody had to ask again.**
 
-### Point your own agent at it — no clone, no Docker
+### Point your own agent at it ;  no clone, no Docker
 
 ```bash
 python scripts/remote_agent.py --url <the public MCP url> \
@@ -33,11 +47,11 @@ Your identity comes from the MCP `clientInfo` handshake, not a field you type, s
 the demand the board shows really is yours. `bash scripts/serve.sh --public`
 prints a live URL for any instance, including your own. The `--query` columns
 must exist in the seeded warehouse (`ecommerce.*` in `infra/warehouse/init.sql`)
-— otherwise the builder declines with a named shortfall instead of inventing a
+;  otherwise the builder declines with a named shortfall instead of inventing a
 table.
 
 **This needs a running instance.** <https://nullspace-five.vercel.app> is a frozen
-snapshot of a real catalog — it is there so the numbers are readable at any hour,
+snapshot of a real catalog ;  it is there so the numbers are readable at any hour,
 but it serves no MCP endpoint and nothing can be written to it. To have your own
 agent create demand, point it at a live instance: ours while the machine hosting it
 is awake, or your own after one `docker compose up`.
@@ -49,7 +63,7 @@ is awake, or your own after one `docker compose up`.
 | A pull request an agent wrote and opened by itself | [`nullspace-dbt#5`](https://github.com/Morkeeth/nullspace-dbt/pull/5), merged |
 | Demand-side metadata proposed upstream | [`datahub-project/datahub#19022`](https://github.com/datahub-project/datahub/pull/19022) |
 | Demand harvested with **zero adoption** | 2,405 real Postgres `relation does not exist` errors → 1,253 attributed requests across 51 wants, ranked |
-| The three blocked queries | run, verified by executing them — `python -m nullspace.console unblocked "monthly recurring revenue by segment"` |
+| The three blocked queries | run, verified by executing them ;  `python -m nullspace.console unblocked "monthly recurring revenue by segment"` |
 
 Delete DataHub and this does not degrade, it disappears: `./scripts/without-datahub.sh`
 shows three agents failing in three silos with no namespace in which the thing
@@ -117,7 +131,7 @@ open http://localhost:8787
 Witnessed on a clean clone with warm images (2026-08-10): substrate ready in
 ~84s, eval to solid (including merge→finalize when `gh` can open a real PR) in
 under 3 minutes wall-clock from `compose up`. First-time image pulls are not
-counted in that number — say so if you film a cold Docker cache.
+counted in that number ;  say so if you film a cold Docker cache.
 
 ## Watch the builder decide
 
@@ -151,14 +165,14 @@ python3 -m nullspace.builder --review-want "your demand"
 
 The builder targets the public fulfillment repo
 [`Morkeeth/nullspace-dbt`](https://github.com/Morkeeth/nullspace-dbt) (D9).
-`main` is hollow — no `ghost_*` models — so every model must arrive through a
+`main` is hollow ;  no `ghost_*` models ;  so every model must arrive through a
 pull request the builder opens against **`main`**.
 
 When the authenticated `gh` CLI (or `NULLSPACE_DBT_TOKEN`) can push, `pr_url` is
 an `https://github.com/...` URL, the ghost stays **claimed** until that PR
 merges, and `python3 -m nullspace.cli finalize --want "..."` solidifies on
 merge. If push is unavailable, `pr_url` stays a `file://` local change
-reference — **not a pull request** — and solidify still runs locally so the
+reference ;  **not a pull request** ;  and solidify still runs locally so the
 DataHub witness path works. Nullspace never claims a PR that does not exist.
 
 Reset a dirty demo graph before a stranger run:
@@ -201,7 +215,7 @@ datahub ingest -c infra/datahub/nullspace_demand.yml
 Ghosts carry **structured properties**, **Query** contracts, **Owners from the
 first miss**, and the fulfillment PR in **institutionalMemory**. Builder plans
 and review receipts live on the ghost URN (`nullspace.builder_plan` /
-`nullspace.builder_receipt`) — delete `/tmp` mid-flight and they still load.
+`nullspace.builder_receipt`) ;  delete `/tmp` mid-flight and they still load.
 Solidify emits a native **DATA_SCHEMA** Assertion (exact match) and records
 `nullspace.assertion_urn`. Optional hydrate-only mode:
 
@@ -215,7 +229,7 @@ Upstream connector sketch: [docs/design/oss-nullspace-demand-source.md](docs/des
 
 ## Subtraction proof (Law 2)
 
-With GMS unreachable, three isolated agents each refuse — there is no shared
+With GMS unreachable, three isolated agents each refuse ;  there is no shared
 namespace in which their demand can be named. The script is an acceptance test
 (non-zero if any assertion silently succeeds):
 
@@ -230,4 +244,8 @@ the product.
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE).
+Apache-2.0 ;  see [LICENSE](LICENSE).
+
+## License and data boundaries
+
+Code terms: [LICENSE](LICENSE). Data, provider responses, media, fonts and other third-party assets may have separate terms. Repository access alone does not grant rights to those materials. 
