@@ -1,7 +1,11 @@
 # Nullspace
 
-**A catalog is a map of what exists. Nullspace makes DataHub the first catalog
-that also maps what is missing.**
+**Nullspace makes DataHub record what your agents searched for and could not find, so the missing tables get built and the blocked agents get unblocked.**
+
+Today when an agent searches a catalog for a table that does not exist, the miss is thrown away: no ticket, no record, nothing.
+For data teams running DataHub with agents that query it.
+Every miss creates or increments a ghost, a real DataHub dataset URN tagged `ghost` with a demand counter and edges back to each agent that asked; at a threshold a builder agent writes a real dbt model and opens a real pull request, and on merge the ghost goes solid.
+A catalog is a map of what exists; this one also maps what is missing. Built for Build with DataHub: The Agent Hackathon. A frozen, readable snapshot: https://nullspace-five.vercel.app
 
 An agent searches for a table it needs, does not find it, and fails silently in
 its own context. That miss is thrown away today — no ticket, no record, nothing.
